@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("Xiangqi Socket Server Running 🚀");
+  res.send("CotuongVIP Server is running");
 });
 
 const server = http.createServer(app);
