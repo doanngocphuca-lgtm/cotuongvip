@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
 
-export const socket = io("http://192.168.1.2:3000", {
+export const socket = io("https://cotuongvip.onrender.com", {
   autoConnect: false
-});
+  });
