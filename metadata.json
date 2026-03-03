@@ -1,0 +1,5 @@
+{
+  "name": "Xiangqi Master",
+  "description": "A feature-rich Chinese Chess (Xiangqi) application with Local Play, AI with multiple difficulties, and move suggestions powered by Gemini.",
+  "requestFramePermissions": []
+}
