@@ -176,31 +176,45 @@ const App: React.FC = () => {
     if (forceColor) setOnline(prev => ({ ...prev, playerColor: forceColor, status: 'WAITING' }));
   }, [settings.timerLimit]);
 
-  // --- Online Sync Logic ---
-  useEffect(() => {
-    if (gameMode !== GameMode.ONLINE || !online.roomCode) return;
+ // --- Online Sync Logic ---
+useEffect(() => {
+  if (gameMode !== GameMode.ONLINE) return;
+  if (!online.roomCode) return;
 
-    socket.connect();
-    socket.emit("join-room", online.roomCode);
+  const join = () => {
+    socket.emit("joinRoom", online.roomCode);
+  };
 
-    socket.on("room-ready", () => {
+  socket.on("connect", join);
+
+  socket.on("room-update", (size) => {
+    console.log("ROOM SIZE:", size);
+
+    if (size === 2) {
       setOnline(prev => ({
         ...prev,
         status: "CONNECTED"
       }));
-    });
+    }
+  });
 
-    socket.on("opponent-move", ({ from, to, by }) => {
-      remoteHandleMove(from, to, by);
-    });
+  socket.on("opponent-move", ({ from, to, by }) => {
+    remoteHandleMove(from, to, by);
+  });
 
-    return () => {
-      socket.off("opponent-move");
-      socket.off("room-ready");
-      socket.disconnect();
-    };
-  }, [gameMode, online.roomCode]); // Không thêm board vào dependency
+  if (!socket.connected) {
+    socket.connect();
+  } else {
+    join();
+  }
 
+  return () => {
+    socket.off("connect", join);
+    socket.off("room-update");
+    socket.off("opponent-move");
+  };
+
+}, [gameMode, online.roomCode]);
   const createRoom = () => {
     const code = Math.floor(1000 + Math.random() * 9000).toString();
     setOnline({ roomCode: code, playerColor: Color.RED, status: 'WAITING', opponentName: 'Đang đợi...' });
